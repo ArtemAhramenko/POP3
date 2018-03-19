@@ -10,16 +10,15 @@ public class StartClient {
 
     private JTextArea textArea = new JTextArea();
     private JTextField textField = new JTextField();
-    private StartClient() {
 
+    private StartClient() {
         final int SERVER_PORT = 1110;
         final String SERVER_HOST = "localhost";
 
         try {
             Socket socket = new Socket(SERVER_HOST, SERVER_PORT);
-            Scanner inData = new Scanner(socket.getInputStream());
             createFrame(new PrintWriter(socket.getOutputStream()));
-            threadInMessages(inData);
+            threadInMessages(new Scanner(socket.getInputStream()));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -40,25 +39,40 @@ public class StartClient {
 
     private void createFrame(PrintWriter outData) {
         JFrame frame = new JFrame();
+        JButton button = new JButton("Send");
+        JPanel panel = new JPanel();
+
+        frameSettings(frame, panel, button);
+        sendButton(button, outData);
+    }
+
+    private JFrame frameSettings(JFrame frame, JPanel panel, JButton button) {
         frame.setSize(new Dimension(500, 400));
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.add(addElmsForPanel(panel, button));
+        frame.setVisible(true);
+        return frame;
+    }
 
-        JPanel panel = new JPanel();
+    private JPanel addElmsForPanel(JPanel panel, JButton button) {
+        textField.setFont(new Font("Courier New", Font.ITALIC, 17));
+        textArea.setFont(new Font("Courier New", Font.ITALIC, 17));
+        textArea.setEditable(false);
         panel.setLayout(new BorderLayout());
-        JButton button = new JButton("Send");
-
         panel.add(textArea, BorderLayout.CENTER);
         panel.add(textField, BorderLayout.NORTH);
         panel.add(button, BorderLayout.SOUTH);
+        return panel;
+    }
 
-        frame.add(panel);
-        frame.setVisible(true);
-
+    private void sendButton(JButton button, PrintWriter outData) {
         button.addActionListener(e -> {
             Scanner inputMessage = new Scanner(textField.getText());
             outData.println(inputMessage.nextLine());
             outData.flush();
+            textField.setText("");
+            textField.requestFocus();
         });
     }
 
