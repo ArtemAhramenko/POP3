@@ -2,6 +2,9 @@ package com.tem.client;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -16,14 +19,14 @@ public class StartClient {
 
         int SERVER_PORT = 1110;
         String SERVER_HOST = "localhost";
-        createFrame();
 
         try {
             Socket socket = new Socket(SERVER_HOST, SERVER_PORT);
+            createFrame(socket);
             Scanner inData = new Scanner(socket.getInputStream());
-            PrintWriter outData = new PrintWriter(socket.getOutputStream());
+            //   PrintWriter outData = new PrintWriter(socket.getOutputStream());
             threadInMessages(inData);
-            outMessage(outData);
+            //   outMessage(outData);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -31,8 +34,7 @@ public class StartClient {
     }
 
     private void outMessage(PrintWriter outData) {
-        Scanner inputMessage = new Scanner(new InputStreamReader(System.in));
-        System.out.println("Typing something..");
+        Scanner inputMessage = new Scanner(textField.getText());
         while (true) {
             if (inputMessage.hasNext()) {
                 outData.println(inputMessage.nextLine());
@@ -54,7 +56,7 @@ public class StartClient {
         }).start();
     }
 
-    private void createFrame() {
+    private void createFrame(Socket socket) {
         JFrame frame = new JFrame();
         frame.setSize(new Dimension(500, 400));
         frame.setLocationRelativeTo(null);
@@ -70,6 +72,15 @@ public class StartClient {
 
         frame.add(panel);
         frame.setVisible(true);
+
+
+        button.addActionListener(e -> {
+            try {
+                outMessage(new PrintWriter(socket.getOutputStream()));
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        });
     }
 
     public static void main(String [] args) {
