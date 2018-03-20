@@ -1,24 +1,21 @@
 package com.tem.server;
 
 import java.net.ServerSocket;
-import java.util.Date;
-import java.util.Objects;
 
 public class StartServer {
 
-    public static void main(String [] args) {
+    private StartServer() {
         final int SERVER_PORT = 1110;
         final int TIMEOUT = 600;
 
         new User("Artem", "123");
-        initMails();
+        new User("Kate", "123");
         try {
-            try (ServerSocket socket = new ServerSocket(SERVER_PORT)) {
-                while (true) {
-                    Server server = new Server(socket.accept(), TIMEOUT);
-                    Thread thread = new Thread(server);
-                    thread.start();
-                }
+            ServerSocket socket = new ServerSocket(SERVER_PORT);
+            while (true) {
+                Server server = new Server(socket.accept(), TIMEOUT);
+                Thread thread = new Thread(server);
+                thread.start();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -26,13 +23,7 @@ public class StartServer {
         }
     }
 
-    private static void initMails(){
-        Mail mail = new Mail(Objects.requireNonNull(User.getUser("Artem")));
-        mail.setContent("This is a message to say hello.");
-        mail.setDate(new Date());
-        mail.setFromAdress("@gmail.com");
-        mail.setFromName("Artem");
-        mail.setMessageId(1);
-        mail.setObject("The test message");
+    public static void main(String [] args) {
+        StartServer startServer = new StartServer();
     }
 }

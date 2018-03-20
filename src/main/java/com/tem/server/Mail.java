@@ -4,10 +4,24 @@ import java.util.Date;
 
 public class Mail {
 
+    private User user;
+    private Date date;
+    private Integer messageId;
+    private Integer size = 0;
     private String content;
     private String fromName;
     private String fromAdress;
     private String object;
+
+
+    Mail(User user){
+        user.addMail(this);
+        setUser(user);
+    }
+
+    public Integer getSize() {
+        return size;
+    }
 
     public String getObject() {
         return object;
@@ -15,20 +29,6 @@ public class Mail {
 
     public void setObject(String object) {
         this.object = object;
-    }
-
-    private User   user;
-    private Date date;
-    private Integer messageId;
-    private Integer size = 0;
-
-    public Integer getSize() {
-        return size;
-    }
-
-    Mail(User u){
-        u.addMail(this);
-        setUser(u);
     }
 
     public String getContent() {

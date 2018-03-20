@@ -1,6 +1,7 @@
 package com.tem.server;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class User {
 
@@ -42,12 +43,32 @@ public class User {
     }
 
 
-    static public User getUser(String username){
+    public static User getUser(String username){
         for(User user: m_users){
-            if(user.username.equals(username))
+            if(user.username.equals(username)) {
+                sendMessages(user);
                 return user;
+            }
         }
         return null;
+    }
+
+    private static void sendMessages(User user) {
+        Mail mail = new Mail(user);
+        mail.setContent("This is a first message to say hello.");
+        mail.setDate(new Date());
+        mail.setFromAdress("@gmail.com");
+        mail.setFromName("Artem");
+        mail.setMessageId(1);
+        mail.setObject("The first test message");
+
+        Mail mail2 = new Mail(user);
+        mail2.setContent("This is a second message to say hello. I made it for changed zie of message.");
+        mail2.setDate(new Date());
+        mail2.setFromAdress("@gmail.com");
+        mail2.setFromName("Artem");
+        mail2.setMessageId(2);
+        mail2.setObject("The second test message");
     }
 
     User(String name, String pwd){

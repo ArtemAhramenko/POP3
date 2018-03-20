@@ -18,7 +18,6 @@ public class Server implements Runnable {
     private State state;
 
     enum State{
-        Closed,
         Authorisation,
         PwdWaiting,
         Transaction
@@ -28,7 +27,6 @@ public class Server implements Runnable {
         this.socket = socket;
         this.socket.setSoTimeout(timeout * 1000);
         state = State.Authorisation;
-		/* Server connection message */
         System.out.println("[" + socket.getInetAddress() + "] " + "Just connected" );
     }
 
@@ -44,23 +42,18 @@ public class Server implements Runnable {
             User user = null;
             out.println("+OK POP3 server ready");
 
-            label:
             while ((input = in.readLine()) != null) {
                 System.out.println(input);
                 switch (state) {
-                    case Closed:
-                        break;
                     case Authorisation:
                         System.out.println("user :" + input);
                         if (input.startsWith("USER")) {
                             String username = input.split(" ")[1];
                             user = User.getUser(username);
-                            if (user == null) {
-                                output = new StringBuilder("-ERR username not recognized");
-                            } else if (user.getLock()) {
-                                output = new StringBuilder("-ERR user is already in use");
+                            if (user == null || user.getLock()) {
+                                output = new StringBuilder("-ERR never heard of mailbox name");
                             } else {
-                                output = new StringBuilder("+OK Waiting for password");
+                                output = new StringBuilder("+OK name is a valid mailbox");
                                 state = State.PwdWaiting;
                             }
                         }
@@ -68,40 +61,41 @@ public class Server implements Runnable {
                     case PwdWaiting:
                         if (input.startsWith("PASS")) {
                             if (user == null) {
-                                System.err.println("User is null, impossible");
+                                System.err.println("ERR unable to lock maildrop");
                             }
                             String pwd = input.split(" ")[1];
                             assert user != null;
                             if (user.getPassword().equals(pwd)) {
-                                output = new StringBuilder("+OK Password is correct, logged in");
+                                output = new StringBuilder("+OK maildrop locked and ready");
                                 state = State.Transaction;
                                 user.setLock(true);
                             } else {
-                                output = new StringBuilder("-ERR wrong password");
+                                output = new StringBuilder("-ERR invalid password");
                             }
                         }
                         break;
-                    default:
+                    case Transaction:
                         if (input.startsWith("QUIT")) {
                             assert user != null;
                             user.setLock(false);
-                            break label;
-                        } else if (input.startsWith("APOP")) {
-                            System.out.println("APOP");
+                            output = new StringBuilder("");
+                            state = State.Authorisation;
+                        } else if (input.startsWith("NOOP")) {
+                            output = new StringBuilder("+OK");
                         } else if (input.startsWith("STAT")) {
-                            Integer sum = 0, nb = 0;
+                            Integer sum = 0, countMessages = 0;
                             assert user != null;
                             for (Mail mail : user.getMails()) {
                                 sum += mail.getSize();
-                                nb++;
+                                countMessages++;
                             }
-                            output = new StringBuilder(" +OK " + nb + " " + sum);
+                            output = new StringBuilder(" +OK " + countMessages + " " + sum);
                         } else if (input.startsWith("RETR")) {
                             Integer id = Integer.parseInt(input.split(" ")[1]);
                             assert user != null;
                             for (Mail mail : user.getMails()) {
                                 if (mail.getMessageId().equals(id)) {
-                                    output = new StringBuilder("+OK " + mail.getMessageId() + " " + mail.getSize() + "\n");
+                                    output = new StringBuilder("+OK message follows\n" + mail.getMessageId() + " " + mail.getSize() + "\n");
                                     output.append("From : ").append(mail.getFromName()).append(" <").append(mail.getFromAdress()).append(">\n");
                                     output.append("To : ").append(mail.getUser().getUsername()).append(" <").append(mail.getUser().getAddress()).append(">\n");
                                     output.append("Subject : ").append(mail.getObject()).append("\n");
@@ -113,7 +107,7 @@ public class Server implements Runnable {
                             }
                         } else if (input.startsWith("LIST")) {
                             assert user != null;
-                            output = new StringBuilder("+OK " + user.getMails().size() + " messages:");
+                            output = new StringBuilder("+OK scan listing follows\n" + user.getMails().size());
                             for (Mail mail : user.getMails()) {
                                 output.append("\n").append(mail.getMessageId()).append(" ").append(mail.getSize());
                             }
