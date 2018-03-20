@@ -8,8 +8,10 @@ public class StartServer {
         final int SERVER_PORT = 1110;
         final int TIMEOUT = 600;
 
+        // add users on server
         new User("Artem", "123");
         new User("Kate", "123");
+
         try {
             ServerSocket socket = new ServerSocket(SERVER_PORT);
             while (true) {

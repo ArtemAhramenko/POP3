@@ -5,7 +5,7 @@ import java.util.Date;
 
 public class User {
 
-    static private ArrayList<User> m_users = new ArrayList<>();
+    static private ArrayList<User> users = new ArrayList<>();
 
     private String username;
     private String password;
@@ -44,7 +44,7 @@ public class User {
 
 
     public static User getUser(String username){
-        for(User user: m_users){
+        for(User user: users){
             if(user.username.equals(username)) {
                 sendMessages(user);
                 return user;
@@ -54,13 +54,13 @@ public class User {
     }
 
     private static void sendMessages(User user) {
-        Mail mail = new Mail(user);
-        mail.setContent("This is a first message to say hello.");
-        mail.setDate(new Date());
-        mail.setFromAdress("@gmail.com");
-        mail.setFromName("Artem");
-        mail.setMessageId(1);
-        mail.setObject("The first test message");
+        Mail mail1 = new Mail(user);
+        mail1.setContent("This is a first message to say hello.");
+        mail1.setDate(new Date());
+        mail1.setFromAdress("@gmail.com");
+        mail1.setFromName("Artem");
+        mail1.setMessageId(1);
+        mail1.setObject("The first test message");
 
         Mail mail2 = new Mail(user);
         mail2.setContent("This is a second message to say hello. I made it for changed zie of message.");
@@ -71,10 +71,10 @@ public class User {
         mail2.setObject("The second test message");
     }
 
-    User(String name, String pwd){
-        this.username = name;
-        this.password = pwd;
-        this.address = name + "@gmail.com";
-        m_users.add(this);
+    User(String username, String password){
+        this.username = username;
+        this.password = password;
+        this.address = username + "@gmail.com";
+        users.add(this);
     }
 }

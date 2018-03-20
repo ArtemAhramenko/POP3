@@ -53,7 +53,7 @@ public class StartClient {
         textArea.setEditable(false);
         textArea.setLineWrap(true);
         frame.add(scrollPane);
-        frame.setSize(new Dimension(600, 500));
+        frame.setSize(new Dimension(750, 650));
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

@@ -1,25 +1,22 @@
 package com.tem.server;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.util.Scanner;
 
 public class Server implements Runnable {
 
     private Socket socket;
-    private InputStreamReader streamReader;
-    private PrintWriter out;
-    private BufferedReader in;
-
+    private PrintWriter outData;
+    private Scanner inData;
     private State state;
 
     enum State{
         Authorisation,
-        PwdWaiting,
+        PasswordWaiting,
         Transaction
     }
 
@@ -32,39 +29,35 @@ public class Server implements Runnable {
 
     @Override
     public void run() {
-
         try {
-            streamReader = new InputStreamReader(socket.getInputStream());
-            out = new PrintWriter(socket.getOutputStream(), true);
-            in = new BufferedReader(streamReader);
-            String input;
+            outData = new PrintWriter(socket.getOutputStream(), true);
+            inData = new Scanner(socket.getInputStream());
             StringBuilder output = new StringBuilder("-ERR unknown error");
             User user = null;
-            out.println("+OK POP3 server ready");
-
-            while ((input = in.readLine()) != null) {
-                System.out.println(input);
+            outData.println("+OK POP3 server ready");
+            while (inData.hasNext()) {
+                String inputData = inData.nextLine();
+                System.out.println(inputData);
                 switch (state) {
                     case Authorisation:
-                        System.out.println("user :" + input);
-                        if (input.startsWith("USER")) {
-                            String username = input.split(" ")[1];
+                        System.out.println("user :" + inputData);
+                        if (inputData.startsWith("USER")) {
+                            String username = inputData.split(" ")[1];
                             user = User.getUser(username);
                             if (user == null || user.getLock()) {
                                 output = new StringBuilder("-ERR never heard of mailbox name");
                             } else {
                                 output = new StringBuilder("+OK name is a valid mailbox");
-                                state = State.PwdWaiting;
+                                state = State.PasswordWaiting;
                             }
                         }
                         break;
-                    case PwdWaiting:
-                        if (input.startsWith("PASS")) {
+                    case PasswordWaiting:
+                        if (inputData.startsWith("PASS")) {
                             if (user == null) {
                                 System.err.println("ERR unable to lock maildrop");
                             }
-                            String pwd = input.split(" ")[1];
-                            assert user != null;
+                            String pwd = inputData.split(" ")[1];
                             if (user.getPassword().equals(pwd)) {
                                 output = new StringBuilder("+OK maildrop locked and ready");
                                 state = State.Transaction;
@@ -75,24 +68,21 @@ public class Server implements Runnable {
                         }
                         break;
                     case Transaction:
-                        if (input.startsWith("QUIT")) {
-                            assert user != null;
+                        if (inputData.startsWith("QUIT")) {
                             user.setLock(false);
                             output = new StringBuilder("");
                             state = State.Authorisation;
-                        } else if (input.startsWith("NOOP")) {
+                        } else if (inputData.startsWith("NOOP")) {
                             output = new StringBuilder("+OK");
-                        } else if (input.startsWith("STAT")) {
+                        } else if (inputData.startsWith("STAT")) {
                             Integer sum = 0, countMessages = 0;
-                            assert user != null;
                             for (Mail mail : user.getMails()) {
                                 sum += mail.getSize();
                                 countMessages++;
                             }
                             output = new StringBuilder(" +OK " + countMessages + " " + sum);
-                        } else if (input.startsWith("RETR")) {
-                            Integer id = Integer.parseInt(input.split(" ")[1]);
-                            assert user != null;
+                        } else if (inputData.startsWith("RETR")) {
+                            Integer id = Integer.parseInt(inputData.split(" ")[1]);
                             for (Mail mail : user.getMails()) {
                                 if (mail.getMessageId().equals(id)) {
                                     output = new StringBuilder("+OK message follows\n" + mail.getMessageId() + " " + mail.getSize() + "\n");
@@ -105,7 +95,7 @@ public class Server implements Runnable {
                                     break;
                                 }
                             }
-                        } else if (input.startsWith("LIST")) {
+                        } else if (inputData.startsWith("LIST")) {
                             assert user != null;
                             output = new StringBuilder("+OK scan listing follows\n" + user.getMails().size());
                             for (Mail mail : user.getMails()) {
@@ -116,7 +106,7 @@ public class Server implements Runnable {
                         }
                         break;
                 }
-                out.println(output);
+                outData.println(output);
             }
         } catch (SocketTimeoutException e) {
             System.out.println("[" + socket.getInetAddress() + "] " + "Socket Timeout");
@@ -124,9 +114,8 @@ public class Server implements Runnable {
             System.err.println("Stream Error");
         } finally {
             try {
-                streamReader.close();
-                in.close();
-                out.close();
+                inData.close();
+                outData.close();
                 socket.close();
             } catch (Exception e){
                 e.printStackTrace();
