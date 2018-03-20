@@ -35,5 +35,4 @@ public class StartServer {
         mail.setMessageId(1);
         mail.setObject("The test message");
     }
-
 }

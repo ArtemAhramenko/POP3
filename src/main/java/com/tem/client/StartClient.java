@@ -33,7 +33,7 @@ public class StartClient {
                     }
                 }
             }
-            catch (Exception ignored){}
+            catch (Exception ignored) {}
         }).start();
     }
 
