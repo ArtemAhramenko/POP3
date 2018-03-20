@@ -16,7 +16,7 @@ public class Server implements Runnable {
 
     enum State{
         Authorisation,
-        PasswordWaiting,
+        Password,
         Transaction
     }
 
@@ -24,7 +24,7 @@ public class Server implements Runnable {
         this.socket = socket;
         this.socket.setSoTimeout(timeout * 1000);
         state = State.Authorisation;
-        System.out.println("[" + socket.getInetAddress() + "] " + "Just connected" );
+        System.out.println("[" + socket.getInetAddress() + "] " + "connected" );
     }
 
     @Override
@@ -48,11 +48,11 @@ public class Server implements Runnable {
                                 output = new StringBuilder("-ERR never heard of mailbox name");
                             } else {
                                 output = new StringBuilder("+OK name is a valid mailbox");
-                                state = State.PasswordWaiting;
+                                state = State.Password;
                             }
                         }
                         break;
-                    case PasswordWaiting:
+                    case Password:
                         if (inputData.startsWith("PASS")) {
                             if (user == null) {
                                 System.err.println("ERR unable to lock maildrop");
@@ -70,7 +70,7 @@ public class Server implements Runnable {
                     case Transaction:
                         if (inputData.startsWith("QUIT")) {
                             user.setLock(false);
-                            output = new StringBuilder("");
+                            output = new StringBuilder("+OK");
                             state = State.Authorisation;
                         } else if (inputData.startsWith("NOOP")) {
                             output = new StringBuilder("+OK");
@@ -86,11 +86,11 @@ public class Server implements Runnable {
                             for (Mail mail : user.getMails()) {
                                 if (mail.getMessageId().equals(id)) {
                                     output = new StringBuilder("+OK message follows\n" + mail.getMessageId() + " " + mail.getSize() + "\n");
-                                    output.append("From : ").append(mail.getFromName()).append(" <").append(mail.getFromAdress()).append(">\n");
-                                    output.append("To : ").append(mail.getUser().getUsername()).append(" <").append(mail.getUser().getAddress()).append(">\n");
-                                    output.append("Subject : ").append(mail.getObject()).append("\n");
-                                    output.append("Date : ").append(mail.getDate().toString()).append("\n");
-                                    output.append("Id : ").append(mail.getMessageId()).append("\n");
+                                    output.append("From: ").append(mail.getFromName()).append(" <").append(mail.getFromAdress()).append(">\n");
+                                    output.append("To: ").append(mail.getUser().getUsername()).append(" <").append(mail.getUser().getAddress()).append(">\n");
+                                    output.append("Subject: ").append(mail.getObject()).append("\n");
+                                    output.append("Date: ").append(mail.getDate().toString()).append("\n");
+                                    output.append("Id: ").append(mail.getMessageId()).append("\n");
                                     output.append(mail.getContent());
                                     break;
                                 }
@@ -114,13 +114,13 @@ public class Server implements Runnable {
             System.err.println("Stream Error");
         } finally {
             try {
-                inData.close();
                 outData.close();
+                inData.close();
                 socket.close();
             } catch (Exception e){
                 e.printStackTrace();
             }
-            System.out.println("[" + socket.getInetAddress() + "] " + "User Disconnected");
+            System.out.println("[" + socket.getInetAddress() + "] " + "disconnected");
         }
     }
 }
