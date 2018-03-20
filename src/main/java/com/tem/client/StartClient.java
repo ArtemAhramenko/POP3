@@ -17,7 +17,7 @@ public class StartClient {
 
         try {
             Socket socket = new Socket(SERVER_HOST, SERVER_PORT);
-            createFrame(new PrintWriter(socket.getOutputStream()));
+            createFrameComponents(new PrintWriter(socket.getOutputStream()));
             threadInMessages(new Scanner(socket.getInputStream()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -37,42 +37,48 @@ public class StartClient {
         }).start();
     }
 
-    private void createFrame(PrintWriter outData) {
+    private void createFrameComponents(PrintWriter outData) {
         JFrame frame = new JFrame();
-        JButton button = new JButton("Send");
         JPanel panel = new JPanel();
-
-        frameSettings(frame, panel, button);
-        sendButton(button, outData);
+        JButton sendButton = new JButton("Send");
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        componentsSettings(frame, panel, sendButton, scrollPane);
+        sendButtonClick(sendButton, outData);
     }
 
-    private JFrame frameSettings(JFrame frame, JPanel panel, JButton button) {
-        frame.setSize(new Dimension(500, 400));
-        frame.setLocationRelativeTo(null);
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.add(addElmsForPanel(panel, button));
-        frame.setVisible(true);
-        return frame;
-    }
-
-    private JPanel addElmsForPanel(JPanel panel, JButton button) {
+    private void componentsSettings(JFrame frame, JPanel panel, JButton button, JScrollPane scrollPane) {
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         textField.setFont(new Font("Courier New", Font.ITALIC, 17));
         textArea.setFont(new Font("Courier New", Font.ITALIC, 17));
         textArea.setEditable(false);
+        textArea.setLineWrap(true);
+        frame.add(scrollPane);
+        frame.setSize(new Dimension(600, 500));
+        frame.setLocationRelativeTo(null);
+        frame.setResizable(false);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.add(addElmsForPanel(panel, button, scrollPane));
+        frame.setVisible(true);
+    }
+
+    private JPanel addElmsForPanel(JPanel panel, JButton button, JScrollPane scrollPane) {
         panel.setLayout(new BorderLayout());
-        panel.add(textArea, BorderLayout.CENTER);
+        panel.add(scrollPane, BorderLayout.CENTER);
         panel.add(textField, BorderLayout.NORTH);
         panel.add(button, BorderLayout.SOUTH);
         return panel;
     }
 
-    private void sendButton(JButton button, PrintWriter outData) {
-        button.addActionListener(e -> {
-            Scanner inputMessage = new Scanner(textField.getText());
-            outData.println(inputMessage.nextLine());
-            outData.flush();
-            textField.setText("");
-            textField.requestFocus();
+    private void sendButtonClick(JButton sendButton, PrintWriter outData) {
+        sendButton.addActionListener(e -> {
+            if (textField.getText().length() != 0){
+                Scanner inputMessage = new Scanner(textField.getText());
+                textArea.append(textField.getText()+"\n");
+                outData.println(inputMessage.nextLine());
+                outData.flush();
+                textField.setText("");
+                textField.requestFocus();
+            }
         });
     }
 

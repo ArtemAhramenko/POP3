@@ -44,14 +44,11 @@ public class Server implements Runnable {
             User user = null;
             out.println("+OK POP3 server ready");
 
-			/* Thread-blocking while loop waits for commands from the client */
             label:
             while ((input = in.readLine()) != null) {
-                /* Handle the client command */
                 System.out.println(input);
                 switch (state) {
                     case Closed:
-
                         break;
                     case Authorisation:
                         System.out.println("user :" + input);
