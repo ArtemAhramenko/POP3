@@ -38,7 +38,7 @@ public class StartClient {
     }
 
     private void createFrameComponents(PrintWriter outData) {
-        JFrame frame = new JFrame();
+        JFrame frame = new JFrame("POP3 Client");
         JPanel panel = new JPanel();
         JButton sendButton = new JButton("Send");
         JScrollPane scrollPane = new JScrollPane(textArea);

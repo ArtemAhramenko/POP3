@@ -111,7 +111,8 @@ public class Server implements Runnable {
                             for (Mail mail : user.getMails()) {
                                 output.append("\n").append(mail.getMessageId()).append(" ").append(mail.getSize());
                             }
-                            output.append("\n.");
+                        } else {
+                            output = new StringBuilder("Unknown command");
                         }
                         break;
                 }

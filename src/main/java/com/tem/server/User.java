@@ -66,7 +66,7 @@ public class User {
         mail2.setContent("This is a second message to say hello. I made it for changed zie of message.");
         mail2.setDate(new Date());
         mail2.setFromAdress("@gmail.com");
-        mail2.setFromName("Artem");
+        mail2.setFromName("Kate");
         mail2.setMessageId(2);
         mail2.setObject("The second test message");
     }
