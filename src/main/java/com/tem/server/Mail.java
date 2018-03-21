@@ -13,7 +13,6 @@ public class Mail {
     private String fromAdress;
     private String object;
 
-
     Mail(User user){
         user.addMail(this);
         setUser(user);

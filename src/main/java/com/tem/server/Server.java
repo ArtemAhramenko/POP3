@@ -68,12 +68,12 @@ public class Server implements Runnable {
                         }
                         break;
                     case Transaction:
-                        if (inputData.startsWith("QUIT")) {
+                        if (inputData.startsWith("NOOP")) {
+                            output = new StringBuilder("+OK");
+                        } else if (inputData.startsWith("QUIT")) {
                             user.setLock(false);
                             output = new StringBuilder("+OK");
                             state = State.Authorisation;
-                        } else if (inputData.startsWith("NOOP")) {
-                            output = new StringBuilder("+OK");
                         } else if (inputData.startsWith("STAT")) {
                             Integer sum = 0, countMessages = 0;
                             for (Mail mail : user.getMails()) {
@@ -95,12 +95,13 @@ public class Server implements Runnable {
                                     break;
                                 }
                             }
+                            output.append("\n.");
                         } else if (inputData.startsWith("LIST")) {
-                            assert user != null;
                             output = new StringBuilder("+OK scan listing follows\n" + user.getMails().size());
                             for (Mail mail : user.getMails()) {
                                 output.append("\n").append(mail.getMessageId()).append(" ").append(mail.getSize());
                             }
+                            output.append("\n.");
                         } else {
                             output = new StringBuilder("Unknown command");
                         }

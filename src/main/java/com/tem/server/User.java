@@ -7,6 +7,7 @@ public class User {
 
     static private ArrayList<User> users = new ArrayList<>();
 
+    private ArrayList<Mail> mails = new ArrayList<>();
     private String username;
     private String password;
     private String address;
@@ -19,8 +20,6 @@ public class User {
     public void setLock(Boolean lock) {
         this.lock = lock;
     }
-
-    private ArrayList<Mail> mails = new ArrayList<>();
 
     public ArrayList<Mail> getMails() {
         return mails;
@@ -63,7 +62,7 @@ public class User {
         mail1.setObject("The first test message");
 
         Mail mail2 = new Mail(user);
-        mail2.setContent("This is a second message to say hello. I made it for changed zie of message.");
+        mail2.setContent("This is a second message to say hello. I made it for changed size of message.");
         mail2.setDate(new Date());
         mail2.setFromAdress("@gmail.com");
         mail2.setFromName("Kate");
