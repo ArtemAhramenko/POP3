@@ -2,7 +2,7 @@ package server;
 
 import java.util.Date;
 
-public class Mail {
+class Mail {
 
     private User user;
     private Date date;
@@ -18,46 +18,46 @@ public class Mail {
         setUser(user);
     }
 
-    public Integer getSize() {
+    Integer getSize() {
         return size;
     }
 
-    public String getObject() {
+    String getObject() {
         return object;
     }
 
-    public void setObject(String object) {
+    void setObject(String object) {
         this.object = object;
     }
 
-    public String getContent() {
+    String getContent() {
         return content;
     }
 
-    public void setContent(String content) {
+    void setContent(String content) {
         this.content = content;
         size += content.length();
     }
 
-    public String getFromName() {
+    String getFromName() {
         return fromName;
     }
 
-    public void setFromName(String fromName) {
+    void setFromName(String fromName) {
         this.fromName = fromName;
         size += fromName.length();
     }
 
-    public String getFromAdress() {
+    String getFromAdress() {
         return fromAdress;
     }
 
-    public void setFromAdress(String fromAdress) {
+    void setFromAdress(String fromAdress) {
         this.fromAdress = fromAdress;
         size += fromAdress.length();
     }
 
-    public User getUser() {
+    User getUser() {
         return user;
     }
 
@@ -67,20 +67,20 @@ public class Mail {
         size += user.getAddress().length();
     }
 
-    public Date getDate() {
+    Date getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    void setDate(Date date) {
         this.date = date;
         size += date.toString().length();
     }
 
-    public Integer getMessageId() {
+    Integer getMessageId() {
         return messageId;
     }
 
-    public void setMessageId(Integer messageId) {
+    void setMessageId(Integer messageId) {
         this.messageId = messageId;
         size += messageId.toString().length();
     }

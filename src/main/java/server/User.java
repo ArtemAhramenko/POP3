@@ -3,7 +3,7 @@ package server;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class User {
+class User {
 
     static private ArrayList<User> users = new ArrayList<>();
 
@@ -13,36 +13,36 @@ public class User {
     private String address;
     private Boolean lock = false;
 
-    public Boolean getLock() {
+    Boolean getLock() {
         return lock;
     }
 
-    public void setLock(Boolean lock) {
+    void setLock(Boolean lock) {
         this.lock = lock;
     }
 
-    public ArrayList<Mail> getMails() {
+    ArrayList<Mail> getMails() {
         return mails;
     }
 
-    public void addMail(Mail m){
+    void addMail(Mail m){
         mails.add(m);
     }
 
-    public String getUsername() {
+    String getUsername() {
         return username;
     }
 
-    public String getPassword() {
+    String getPassword() {
         return password;
     }
 
-    public String getAddress() {
+    String getAddress() {
         return address;
     }
 
 
-    public static User getUser(String username){
+    static User getUser(String username){
         for(User user: users){
             if(user.username.equals(username)) {
                 sendMessages(user);
@@ -53,21 +53,23 @@ public class User {
     }
 
     private static void sendMessages(User user) {
-        Mail mail1 = new Mail(user);
+        Mail mail1 = createMessage(user);
         mail1.setContent("This is a first message to say hello.");
-        mail1.setDate(new Date());
-        mail1.setFromAdress("@gmail.com");
         mail1.setFromName("Artem");
         mail1.setMessageId(1);
-        mail1.setObject("The first test message");
 
-        Mail mail2 = new Mail(user);
+        Mail mail2 = createMessage(user);
         mail2.setContent("This is a second message to say hello. I made it for changed size of message.");
-        mail2.setDate(new Date());
-        mail2.setFromAdress("@gmail.com");
         mail2.setFromName("Kate");
         mail2.setMessageId(2);
-        mail2.setObject("The second test message");
+    }
+
+    private static Mail createMessage(User user) {
+        Mail mail = new Mail(user);
+        mail.setDate(new Date());
+        mail.setFromAdress("@gmail.com");
+        mail.setObject("The test message");
+        return mail;
     }
 
     User(String username, String password){

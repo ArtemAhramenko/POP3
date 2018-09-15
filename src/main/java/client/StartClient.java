@@ -10,10 +10,10 @@ public class StartClient {
 
     private JTextArea textArea = new JTextArea();
     private JTextField textField = new JTextField();
+    private static final int SERVER_PORT = 1110;
+    private static final String SERVER_HOST = "localhost";
 
     private StartClient() {
-        final int SERVER_PORT = 1110;
-        final String SERVER_HOST = "localhost";
         try {
             Socket socket = new Socket(SERVER_HOST, SERVER_PORT);
             createFrameComponents(new PrintWriter(socket.getOutputStream()));
