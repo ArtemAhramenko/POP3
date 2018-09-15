@@ -1,4 +1,4 @@
-package com.tem.client;
+package client;
 
 import javax.swing.*;
 import java.awt.*;

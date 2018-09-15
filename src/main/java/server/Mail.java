@@ -1,4 +1,4 @@
-package com.tem.server;
+package server;
 
 import java.util.Date;
 
